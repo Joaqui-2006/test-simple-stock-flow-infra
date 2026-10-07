@@ -1,4 +1,4 @@
-﻿# test-simple-stock-flow-infra
+# test-simple-stock-flow-infra
 
 > **Prueba tÃ©cnica Â· Ficha ADSO 3413974**  
 > Infraestructura de contenedores y orquestaciÃ³n con Docker Compose.
