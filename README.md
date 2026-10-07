@@ -1,45 +1,47 @@
-# test-simple-stock-flow-infra
+﻿# test-simple-stock-flow-infra
 
-> **Prueba técnica · Ficha ADSO 3413974**
-> Horario: de **9:00 a. m. a 3:00 p. m.** (15:00)
+> **Prueba tÃ©cnica Â· Ficha ADSO 3413974**  
+> Infraestructura de contenedores y orquestaciÃ³n con Docker Compose.
 
-Este repositorio es la **infraestructura** de *Simple Stock Flow*: contenedores, red, volúmenes y el motor de base de datos vacío. **Empieza vacío a propósito**: se construye en el fork de cada aprendiz.
+---
 
-## Instrucciones
+### 1. QuÃ© es esto
+Es el orquestador de contenedores, redes y volÃºmenes persistentes de todo el sistema *Simple Stock Flow*. Provee el motor de base de datos MySQL 8.4 limpio (sin DDL previo, ya que las migraciones pertenecen a la API segÃºn ADR-001), el contenedor de la API en Laravel y el contenedor web Nginx con la aplicaciÃ³n React compilada. **No contiene** ninguna lÃ³gica de negocio ni cÃ³digo de aplicaciÃ³n.
 
-Cada aprendiz debe **crear el fork** de los seis repositorios del proyecto y **resolver el proyecto
-con el spec planteado**.
+### 2. CÃ³mo se levanta
+Desde un equipo limpio con Docker instalado:
+```bash
+# 1. Crear el archivo de entorno a partir del ejemplo
+cp .env.example .env
 
-1. Hacer fork, a su cuenta de GitHub, de cada repositorio de la tabla del final.
-2. Leer el spec en [`test-simple-stock-flow-docs`](https://github.com/code-sena/test-simple-stock-flow-docs).
-   Se entrega en dos versiones: `spec-python/` y `spec-.net/`.
-3. Desarrollar en los forks.
+# 2. Levantar el ecosistema completo
+docker compose up --build -d
+```
+Los servicios estarÃ¡n disponibles en:
+* **Frontend Web (React):** `http://localhost:8080`
+* **Backend API (Laravel):** `http://localhost:8000`
+* **Base de datos (MySQL):** `localhost:3306`
 
-## El reto se desarrolla con React y PHP (Laravel)
+### 3. DÃ³nde estÃ¡n los datos
+* **Motor:** MySQL 8.4
+* **Base de datos:** `stockflow`
+* **Usuario:** `stockflow_user`
+* **Puerto host:** `3306` (puerto de red interna: `3306`)
+* **Credenciales:** Definidas en el archivo `.env` (`DB_PASSWORD`).
+Para acceder con un cliente de terminal o DBeaver/Workbench:
+```bash
+mysql -h 127.0.0.1 -P 3306 -u stockflow_user -p stockflow
+```
 
-El spec está escrito para Python y para .NET, pero el reto **no** se hace en esos lenguajes:
+### 4. CÃ³mo se prueba
+Para verificar el estado de salud de todos los contenedores:
+```bash
+docker compose ps
+```
+Para ejecutar las pruebas y verificaciÃ³n arquitectÃ³nica dentro de la API:
+```bash
+docker compose run --rm api bash verify.sh
+```
 
-| Capa | Tecnología del reto |
-|---|---|
-| Frontend | React |
-| Backend | PHP con Laravel |
-
-Lo que el spec define sobre el negocio —historias, criterios de aceptación, reglas, contrato de la
-API, modelo de datos— se respeta. Lo que define sobre la tecnología se traduce a React y Laravel.
-
-## La prueba no consiste en escribir el código
-
-El propósito principal es ver la **capacidad de desempeño con SDD** (*Spec-Driven Development*,
-desarrollo guiado por especificación): cómo se lee, se interpreta y se aplica una especificación
-para llevarla a un stack distinto. El código es el medio, no el fin.
-
-## Los seis repositorios
-
-| Repositorio | Qué va ahí |
-|---|---|
-| [`test-simple-stock-flow-docs`](https://github.com/code-sena/test-simple-stock-flow-docs) | El spec: `spec-python/` y `spec-.net/` |
-| [`test-simple-stock-flow-api`](https://github.com/code-sena/test-simple-stock-flow-api) | Backend en PHP (Laravel) |
-| [`test-simple-stock-flow-app`](https://github.com/code-sena/test-simple-stock-flow-app) | Frontend en React |
-| [`test-simple-stock-flow-page`](https://github.com/code-sena/test-simple-stock-flow-page) | Sitio público estático de presentación |
-| [`test-simple-stock-flow-infra`](https://github.com/code-sena/test-simple-stock-flow-infra) | Contenedores, red, volúmenes y motor de base de datos vacío |
-| [`test-simple-stock-flow-tool`](https://github.com/code-sena/test-simple-stock-flow-tool) | Utilidades: sembrador de datos de demostración |
+### 5. QuÃ© falta
+Toda la configuraciÃ³n declarativa de contenedores, volÃºmenes con nombre para evitar problemas de permisos en Windows y la red puente `stockflow-network` estÃ¡n completas y operativas.
